@@ -12,7 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity {
@@ -53,15 +55,35 @@ public class EarthquakeActivity extends AppCompatActivity {
             Earthquake currentEarthquake = getItem(position);
 
             TextView magnitudeView = convertView.findViewById(R.id.earthquake_magnitude);
-            TextView locationView = convertView.findViewById(R.id.earthquake_location);
+            TextView locationView = convertView.findViewById(R.id.earthquake_location_primary);
+            TextView dateView = convertView.findViewById(R.id.earthquake_date);
             TextView timeView = convertView.findViewById(R.id.earthquake_time);
 
             magnitudeView.setText(currentEarthquake.getMagnitude());
             locationView.setText(currentEarthquake.getLocation());
-            timeView.setText(currentEarthquake.getTime());
+
+            Date dateObject = new Date(currentEarthquake.getTimeInMilliseconds());
+
+            String formattedDate = formatDate(dateObject);
+            dateView.setText(formattedDate);
+
+            String formattedTime = formatTime(dateObject);
+            timeView.setText(formattedTime);
+
 
             return convertView;
 
         }
+
+        private String formatDate(Date date) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yy");
+            return dateFormat.format(date);
+        }
+
+        private String formatTime(Date date) {
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+            return timeFormat.format(date);
+        }
+
     }
 }

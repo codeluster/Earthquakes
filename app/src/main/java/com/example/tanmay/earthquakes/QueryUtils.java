@@ -6,7 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.SimpleTimeZone;
 
 public final class QueryUtils {
 
@@ -60,9 +63,11 @@ public final class QueryUtils {
 
                 String magnitude = properties.getString("mag");
                 String location = properties.getString("place");
-                String time = properties.getString("time");
 
-                Earthquake earthquake = new Earthquake(magnitude, location, time);
+                // UNIX time format
+                long timeInMilliseconds = Long.valueOf(properties.getString("time"));
+
+                Earthquake earthquake = new Earthquake(magnitude, location, timeInMilliseconds);
                 earthquakes.add(earthquake);
 
             }
