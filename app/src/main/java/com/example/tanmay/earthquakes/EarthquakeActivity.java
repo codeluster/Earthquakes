@@ -55,12 +55,25 @@ public class EarthquakeActivity extends AppCompatActivity {
             Earthquake currentEarthquake = getItem(position);
 
             TextView magnitudeView = convertView.findViewById(R.id.earthquake_magnitude);
-            TextView locationView = convertView.findViewById(R.id.earthquake_location_primary);
+            TextView offsetLocationView = convertView.findViewById(R.id.earthquake_location_offset);
+            TextView primaryLocationView = convertView.findViewById(R.id.earthquake_location_primary);
             TextView dateView = convertView.findViewById(R.id.earthquake_date);
             TextView timeView = convertView.findViewById(R.id.earthquake_time);
 
             magnitudeView.setText(currentEarthquake.getMagnitude());
-            locationView.setText(currentEarthquake.getLocation());
+
+            String location = currentEarthquake.getLocation();
+
+            int breakStringIndex = location.indexOf(" of ") + 4;
+
+            // Offset location not present
+            if (breakStringIndex < 4) {
+                offsetLocationView.setText(R.string.offset_default);
+                primaryLocationView.setText(location);
+            } else {
+                offsetLocationView.setText(location.substring(0, breakStringIndex));
+                primaryLocationView.setText(location.substring(breakStringIndex));
+            }
 
             Date dateObject = new Date(currentEarthquake.getTimeInMilliseconds());
 

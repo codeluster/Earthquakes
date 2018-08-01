@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Earthquakes</string>
+
+    <!-- Text when offest location not present -->
+    <string name="offset_default">Near</string>
+
 </resources>
