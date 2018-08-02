@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
+//import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.content.Loader;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,29 +27,33 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity {
+public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<Earthquake>> {
 
     private static final String LOG_TAG = EarthquakeActivity.class.getSimpleName();
-
+    private static final int EARTHQUAKE_LOADER_ID = 29021;
     private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=0&limit=70";
 
     private static EarthquakeAdapter adapter;
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_earthquake);
 
-        EarthquakeAsyncTask earthquakeAsyncTask = new EarthquakeAsyncTask();
+//        EarthquakeAsyncTask earthquakeAsyncTask = new EarthquakeAsyncTask();
 
         ListView earthquakeListView = findViewById(R.id.activity_earthquake_list_view);
         View emptyView = findViewById(R.id.activity_earthquake_empty_view);
         earthquakeListView.setEmptyView(emptyView);
         adapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
 
-        // Executed after listview and adapter initialized
-        earthquakeAsyncTask.execute(USGS_REQUEST_URL);
+
+        // Old implementation using AsyncTask
+//        earthquakeAsyncTask.execute(USGS_REQUEST_URL);
+
+        // Executed after ListView and adapter initialized
+        LoaderManager manager = getLoaderManager();
+        manager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
 
         earthquakeListView.setAdapter(adapter);
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -70,32 +77,55 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     }
 
-    private class EarthquakeAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
+    @NonNull
+    @Override
+    public Loader<List<Earthquake>> onCreateLoader(int i, @Nullable Bundle bundle) {
+        // Create new Earthquake Loader
+        return new EarthquakeLoader(this, USGS_REQUEST_URL);
+    }
 
-        @Override
-        protected List<Earthquake> doInBackground(String... strings) {
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
 
-            if (strings.length < 1 || strings[0] == null) return null;
+        adapter.clear();
 
-            return QueryUtils.fetchEarthquakeData(strings[0]);
-        }
-
-        @Override
-        protected void onPostExecute(List<Earthquake> earthquakes) {
-
-            // Clear the adapter of previous earthquake data
-            adapter.clear();
-
-            // If there is valid list of Earthquakes
-            if (earthquakes != null && !earthquakes.isEmpty()) {
-                // Add them to the adapter's data set
-                adapter.addAll(earthquakes);
-                // This will force the ListView to update
-            }
-
-
+        // Inject adapter with new data
+        if (earthquakes != null && !earthquakes.isEmpty()) {
+            adapter.addAll(earthquakes);
         }
     }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<List<Earthquake>> loader) {
+        adapter.clear();
+    }
+
+//    private class EarthquakeAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
+//
+//        @Override
+//        protected List<Earthquake> doInBackground(String... strings) {
+//
+//            if (strings.length < 1 || strings[0] == null) return null;
+//
+//            return QueryUtils.fetchEarthquakeData(strings[0]);
+//        }
+//
+//        @Override
+//        protected void onPostExecute(List<Earthquake> earthquakes) {
+//
+//            // Clear the adapter of previous earthquake data
+//            adapter.clear();
+//
+//            // If there is valid list of Earthquakes
+//            if (earthquakes != null && !earthquakes.isEmpty()) {
+//                // Add them to the adapter's data set
+//                adapter.addAll(earthquakes);
+//                // This will force the ListView to update
+//            }
+//
+//
+//        }
+//    }
 
     private class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
