@@ -1,7 +1,9 @@
 package com.example.tanmay.earthquakes;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,13 +34,26 @@ public class EarthquakeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_earthquake);
 
         // Create a list of earthquakes
-        ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes();
+        final ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes();
 
         ListView earthquakeListView = findViewById(R.id.activity_earthquake_list_view);
 
         EarthquakeAdapter adapter = new EarthquakeAdapter(this, earthquakes);
 
         earthquakeListView.setAdapter(adapter);
+        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String url = earthquakes.get(i).getUrl();
+
+                Uri earthquakeUri = Uri.parse(url);
+
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
+
+                startActivity(websiteIntent);
+
+            }
+        });
 
     }
 
