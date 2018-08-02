@@ -28,7 +28,7 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = EarthquakeActivity.class.getSimpleName();
 
-    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=1&limit=50";
+    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=0&limit=70";
 
     private static EarthquakeAdapter adapter;
 
@@ -209,7 +209,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                     magnitudeColorResourceId = R.color.magnitude10plus;
                     break;
                 default:
-                    magnitudeColorResourceId = android.R.color.black;
+                    magnitudeColorResourceId = R.color.magnitude0;
                     break;
             }
 
