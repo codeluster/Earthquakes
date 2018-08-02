@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
@@ -36,21 +35,20 @@ public class EarthquakeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_earthquake);
 
-
-        // Create a list of earthquakes
-        final ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes();
-
         ListView earthquakeListView = findViewById(R.id.activity_earthquake_list_view);
 
-        EarthquakeAdapter adapter = new EarthquakeAdapter(this, earthquakes);
+        final EarthquakeAdapter adapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
 
         earthquakeListView.setAdapter(adapter);
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String url = earthquakes.get(i).getUrl();
 
-                Uri earthquakeUri = Uri.parse(url);
+                // Find the current earthquake that was clicked on
+                Earthquake currentEarthquake = adapter.getItem(i);
+
+                // Convert the String URL into a URI object
+                Uri earthquakeUri = Uri.parse(currentEarthquake.getUrl());
 
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
 
@@ -68,8 +66,7 @@ public class EarthquakeActivity extends AppCompatActivity {
 
             if (strings.length < 1 || strings[0] == null) return null;
 
-
-            return null;
+            return QueryUtils.fetchEarthquakeData(USGS_REQUEST_URL);
         }
 
         @Override
