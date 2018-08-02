@@ -6,13 +6,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.SimpleTimeZone;
 
 public final class QueryUtils {
+
+    private static final String LOG_TAG = QueryUtils.class.getSimpleName();
 
     private static final String SAMPLE_JSON_RESPONSE =
             "{\"type\":\"FeatureCollection\",\"metadata\":{\"generated\":1462295443000,\"url\":\"http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-01-31&minmag=6&limit=10\",\"title\":\"USGS Earthquakes\",\"status\":200,\"api\":\"1.5.2\",\"limit\":10,\"offset\":1,\"count\":10},\"features\":[{\"type\":\"Feature\",\"properties\":{\"mag\":7.2,\"place\":\"88km N of Yelizovo, Russia\",\"time\":1454124312220,\"updated\":1460674294040,\"tz\":720,\"url\":\"http://earthquake.usgs.gov/earthquakes/eventpage/us20004vvx\",\"detail\":\"http://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us20004vvx&format=geojson\",\"felt\":2,\"cdi\":3.4,\"mmi\":5.82,\"alert\":\"green\",\"status\":\"reviewed\",\"tsunami\":1,\"sig\":798,\"net\":\"us\",\"code\":\"20004vvx\",\"ids\":\",at00o1qxho,pt16030050,us20004vvx,gcmt20160130032510,\",\"sources\":\",at,pt,us,gcmt,\",\"types\":\",cap,dyfi,finite-fault,general-link,general-text,geoserve,impact-link,impact-text,losspager,moment-tensor,nearby-cities,origin,phase-data,shakemap,tectonic-summary,\",\"nst\":null,\"dmin\":0.958,\"rms\":1.19,\"gap\":17,\"magType\":\"mww\",\"type\":\"earthquake\",\"title\":\"M 7.2 - 88km N of Yelizovo, Russia\"},\"geometry\":{\"type\":\"Point\",\"coordinates\":[158.5463,53.9776,177]},\"id\":\"us20004vvx\"},\n" +
@@ -85,4 +94,85 @@ public final class QueryUtils {
         // Return the list of earthquakes
         return earthquakes;
     }
+
+    // Converts a string into a URL object
+    private static URL createUrl(String stringUrl) {
+        URL url = null;
+        try {
+            url = new URL(stringUrl);
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Problem building the URL, " + e);
+        }
+        // In case of exception url is null
+        return url;
+    }
+
+    private static String makeHTTPRequest(URL url) throws IOException {
+
+        // Initially response value is blank
+        String JSONResponse = "";
+
+        // If URL is null return empty JSONResponse
+        if (url == null) return JSONResponse;
+
+        HttpURLConnection urlConnection = null;
+        InputStream inputStream = null;
+
+        try {
+
+            // Prepare a new HttpURLConnection
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000 /*milliseconds*/);
+            urlConnection.setConnectTimeout(15000 /*milliseconds*/);
+            urlConnection.setRequestMethod("GET");
+
+            // Actually open a new connection
+            urlConnection.connect();
+
+            // If request successful (response code 200),
+            // then read input stream and parse response
+            if (urlConnection.getResponseCode() == 200) {
+                inputStream = urlConnection.getInputStream();
+                JSONResponse = readFromStream(inputStream);
+            } else {
+                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Problem retrieving the earthquake JSON results.", e);
+        } finally {
+            if (urlConnection != null) urlConnection.disconnect();
+            if (inputStream != null) inputStream.close();
+        }
+        return JSONResponse;
+    }
+
+    private static String readFromStream(InputStream stream) throws IOException {
+
+        // Since output will be built line-by-line
+        // StringBuilder is being used instead of String
+        StringBuilder output = new StringBuilder();
+
+        if (stream != null) {
+            InputStreamReader inputStreamReader = new InputStreamReader(stream, Charset.forName("UTF-8" /*Name of Charset to convert to*/));
+
+            // Since InputStreamReader can only read one character at a time
+            // but a BufferedReader can read a lot more at once it is being used
+            // to imporve performance (dramatically)
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            // First line of the stream
+            String line = bufferedReader.readLine();
+
+            // Read till end of stream
+            while (line != null) {
+                // Append line to StringBuilder
+                output.append(line);
+                // readline() automatically moves to next line after reading
+                line = bufferedReader.readLine();
+            }
+        }
+        // This would be empty if stream == null
+        return output.toString();
+    }
+
 }
