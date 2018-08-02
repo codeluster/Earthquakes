@@ -7,5 +7,7 @@
     <string name="progress_bar_text">Loading</string>
     <!-- Text in empty view when no earthquakes found -->
     <string name="earthquake_loading_failed">No earthquakes found.</string>
+    <!-- Text in empty view when no internet connection -->
+    <string name="error_no_internet">No internet connection.</string>
 
 </resources>

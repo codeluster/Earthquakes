@@ -3,6 +3,8 @@ package com.example.tanmay.earthquakes;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 //import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -33,7 +35,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     private static final int EARTHQUAKE_LOADER_ID = 29021;
 
-    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=9&limit=70";
+    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=70";
 
     private static ListView earthquakeListView;
     private static EarthquakeAdapter adapter;
@@ -50,33 +52,44 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         earthquakeListView.setEmptyView(emptyView);
         adapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
 
-
         // Old implementation using AsyncTask
 //        earthquakeAsyncTask.execute(USGS_REQUEST_URL);
 
-        // Executed after ListView and adapter initialized
-        LoaderManager manager = getLoaderManager();
-        manager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
 
-        earthquakeListView.setAdapter(adapter);
-        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
 
-                // Find the current earthquake that was clicked on
-                Earthquake currentEarthquake = adapter.getItem(i);
+            // Executed after ListView and adapter initialized
+            LoaderManager manager = getLoaderManager();
+            manager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
 
-                // Convert the String URL into a URI object
-                Uri earthquakeUri = Uri.parse(currentEarthquake.getUrl());
+            earthquakeListView.setAdapter(adapter);
+            earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                // Create a new intent to view the earthquake URI
-                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
+                    // Find the current earthquake that was clicked on
+                    Earthquake currentEarthquake = adapter.getItem(i);
 
-                // Send the intent to launch a new activity
-                startActivity(websiteIntent);
+                    // Convert the String URL into a URI object
+                    Uri earthquakeUri = Uri.parse(currentEarthquake.getUrl());
 
-            }
-        });
+                    // Create a new intent to view the earthquake URI
+                    Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
+
+                    // Send the intent to launch a new activity
+                    startActivity(websiteIntent);
+
+                }
+            });
+        } else {
+            View emptyView2 = earthquakeListView.getEmptyView();
+            View progressBar = emptyView2.findViewById(R.id.activity_earthquake_empty_view_progressbar);
+            progressBar.setVisibility(View.GONE);
+            TextView textView = emptyView2.findViewById(R.id.activity_earthquake_empty_view_text);
+            textView.setText(R.string.error_no_internet);
+        }
 
     }
 
@@ -90,17 +103,17 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     @Override
     public void onLoadFinished(@NonNull Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
 
+        View emptyView = earthquakeListView.getEmptyView();
+        View progressBar = emptyView.findViewById(R.id.activity_earthquake_empty_view_progressbar);
+        progressBar.setVisibility(View.GONE);
+        TextView textView = emptyView.findViewById(R.id.activity_earthquake_empty_view_text);
+        textView.setText(R.string.earthquake_loading_failed);
+
         adapter.clear();
 
         // Inject adapter with new data
         if (earthquakes != null && !earthquakes.isEmpty()) {
             adapter.addAll(earthquakes);
-        } else {
-            View emptyView = earthquakeListView.getEmptyView();
-            View progressBar = emptyView.findViewById(R.id.activity_earthquake_empty_view_progressbar);
-            progressBar.setVisibility(View.GONE);
-            TextView textView = emptyView.findViewById(R.id.activity_earthquake_empty_view_text);
-            textView.setText(R.string.earthquake_loading_failed);
         }
     }
 
