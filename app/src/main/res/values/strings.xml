@@ -3,5 +3,6 @@
 
     <!-- Text when offest location not present -->
     <string name="offset_default">Near</string>
+    <string name="progress_bar_text">Loading</string>
 
 </resources>

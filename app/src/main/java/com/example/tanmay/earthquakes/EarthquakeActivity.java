@@ -28,16 +28,25 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = EarthquakeActivity.class.getSimpleName();
 
-    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
+    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=1&limit=50";
+
+    private static EarthquakeAdapter adapter;
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_earthquake);
 
-        ListView earthquakeListView = findViewById(R.id.activity_earthquake_list_view);
+        EarthquakeAsyncTask earthquakeAsyncTask = new EarthquakeAsyncTask();
 
-        final EarthquakeAdapter adapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
+        ListView earthquakeListView = findViewById(R.id.activity_earthquake_list_view);
+        View emptyView = findViewById(R.id.activity_earthquake_empty_view);
+        earthquakeListView.setEmptyView(emptyView);
+        adapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
+
+        // Executed after listview and adapter initialized
+        earthquakeAsyncTask.execute(USGS_REQUEST_URL);
 
         earthquakeListView.setAdapter(adapter);
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -50,8 +59,10 @@ public class EarthquakeActivity extends AppCompatActivity {
                 // Convert the String URL into a URI object
                 Uri earthquakeUri = Uri.parse(currentEarthquake.getUrl());
 
+                // Create a new intent to view the earthquake URI
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
 
+                // Send the intent to launch a new activity
                 startActivity(websiteIntent);
 
             }
@@ -66,11 +77,22 @@ public class EarthquakeActivity extends AppCompatActivity {
 
             if (strings.length < 1 || strings[0] == null) return null;
 
-            return QueryUtils.fetchEarthquakeData(USGS_REQUEST_URL);
+            return QueryUtils.fetchEarthquakeData(strings[0]);
         }
 
         @Override
         protected void onPostExecute(List<Earthquake> earthquakes) {
+
+            // Clear the adapter of previous earthquake data
+            adapter.clear();
+
+            // If there is valid list of Earthquakes
+            if (earthquakes != null && !earthquakes.isEmpty()) {
+                // Add them to the adapter's data set
+                adapter.addAll(earthquakes);
+                // This will force the ListView to update
+            }
+
 
         }
     }
