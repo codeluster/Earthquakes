@@ -20,12 +20,14 @@
         android:layout_centerInParent="true">
 
         <ProgressBar
+            android:id="@+id/activity_earthquake_empty_view_progressbar"
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp" />
 
         <TextView
+            android:id="@+id/activity_earthquake_empty_view_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

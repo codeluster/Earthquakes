@@ -30,9 +30,12 @@ import java.util.List;
 public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<Earthquake>> {
 
     private static final String LOG_TAG = EarthquakeActivity.class.getSimpleName();
-    private static final int EARTHQUAKE_LOADER_ID = 29021;
-    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=0&limit=70";
 
+    private static final int EARTHQUAKE_LOADER_ID = 29021;
+
+    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=9&limit=70";
+
+    private static ListView earthquakeListView;
     private static EarthquakeAdapter adapter;
 
     @Override
@@ -42,7 +45,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
 //        EarthquakeAsyncTask earthquakeAsyncTask = new EarthquakeAsyncTask();
 
-        ListView earthquakeListView = findViewById(R.id.activity_earthquake_list_view);
+        earthquakeListView = findViewById(R.id.activity_earthquake_list_view);
         View emptyView = findViewById(R.id.activity_earthquake_empty_view);
         earthquakeListView.setEmptyView(emptyView);
         adapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
@@ -92,6 +95,12 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         // Inject adapter with new data
         if (earthquakes != null && !earthquakes.isEmpty()) {
             adapter.addAll(earthquakes);
+        } else {
+            View emptyView = earthquakeListView.getEmptyView();
+            View progressBar = emptyView.findViewById(R.id.activity_earthquake_empty_view_progressbar);
+            progressBar.setVisibility(View.GONE);
+            TextView textView = emptyView.findViewById(R.id.activity_earthquake_empty_view_text);
+            textView.setText(R.string.earthquake_loading_failed);
         }
     }
 

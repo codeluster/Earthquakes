@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Earthquakes</string>
 
-    <!-- Text when offest location not present -->
+    <!-- Text when offset location not present -->
     <string name="offset_default">Near</string>
+    <!-- Text with progress bar when earthquakes are being loaded -->
     <string name="progress_bar_text">Loading</string>
+    <!-- Text in empty view when no earthquakes found -->
+    <string name="earthquake_loading_failed">No earthquakes found.</string>
 
 </resources>
