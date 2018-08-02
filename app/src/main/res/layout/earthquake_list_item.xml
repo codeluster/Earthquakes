@@ -7,18 +7,24 @@
     android:padding="16dp">
 
     <TextView
-        android:layout_gravity="center_vertical"
         android:id="@+id/earthquake_magnitude"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/magnitude_circle"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/white"
         tools:text="7.8" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="4"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
@@ -27,22 +33,26 @@
             android:layout_height="wrap_content"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/textColorEarthquakeDetails"
             tools:text="74km NW of" />
 
         <TextView
             android:id="@+id/earthquake_location_primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:maxLines="2"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/textColorEarthquakeLocation"
             tools:text="Paris, France" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
@@ -51,6 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/textColorEarthquakeDetails"
             tools:text="17 Feb, 14" />
 
         <TextView
@@ -58,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/textColorEarthquakeDetails"
             tools:text="12:59 PM" />
 
     </LinearLayout>
