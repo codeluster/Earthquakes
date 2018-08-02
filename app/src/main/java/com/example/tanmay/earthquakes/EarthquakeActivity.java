@@ -12,10 +12,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
@@ -60,22 +62,30 @@ public class EarthquakeActivity extends AppCompatActivity {
             TextView dateView = convertView.findViewById(R.id.earthquake_date);
             TextView timeView = convertView.findViewById(R.id.earthquake_time);
 
-            magnitudeView.setText(currentEarthquake.getMagnitude());
+            float magnitude_raw = currentEarthquake.getMagnitude();
 
-            String location = currentEarthquake.getLocation();
+            // Convert all magnitudes into decimal with one place
+            DecimalFormat formatter = new DecimalFormat("0.0");
+            String magnitude_formatted = formatter.format(magnitude_raw);
 
-            int breakStringIndex = location.indexOf(" of ") + 4;
+            magnitudeView.setText(magnitude_formatted);
+
+            String location_raw = currentEarthquake.getLocation();
+
+            int breakStringIndex = location_raw.indexOf(" of ") + 4;
 
             // Offset location not present
             if (breakStringIndex < 4) {
                 offsetLocationView.setText(R.string.offset_default);
-                primaryLocationView.setText(location);
+                primaryLocationView.setText(location_raw);
             } else {
-                offsetLocationView.setText(location.substring(0, breakStringIndex));
-                primaryLocationView.setText(location.substring(breakStringIndex));
+                offsetLocationView.setText(location_raw.substring(0, breakStringIndex));
+                primaryLocationView.setText(location_raw.substring(breakStringIndex));
             }
 
-            Date dateObject = new Date(currentEarthquake.getTimeInMilliseconds());
+            long time_raw = currentEarthquake.getTimeInMilliseconds();
+
+            Date dateObject = new Date(time_raw);
 
             String formattedDate = formatDate(dateObject);
             dateView.setText(formattedDate);

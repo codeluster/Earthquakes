@@ -2,11 +2,11 @@ package com.example.tanmay.earthquakes;
 
 public class Earthquake {
 
-    private String magnitude;
+    private float magnitude;
     private String location;
     private long timeInMilliseconds;
 
-    public Earthquake(String magnitude, String location, long timeInMilliseconds) {
+    public Earthquake(float magnitude, String location, long timeInMilliseconds) {
         this.magnitude = magnitude;
         this.location = location;
         this.timeInMilliseconds = timeInMilliseconds;
@@ -20,7 +20,7 @@ public class Earthquake {
         return this.timeInMilliseconds;
     }
 
-    public String getMagnitude() {
+    public float getMagnitude() {
         return this.magnitude;
     }
 
